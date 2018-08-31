@@ -20,9 +20,6 @@ pragma solidity 0.4.24;
 pragma experimental "v0.5.0";
 
 import { SafeMath } from "openzeppelin-solidity/contracts/math/SafeMath.sol";
-import { HasNoContracts } from "openzeppelin-solidity/contracts/ownership/HasNoContracts.sol";
-import { HasNoEther } from "openzeppelin-solidity/contracts/ownership/HasNoEther.sol";
-import { ERC20 } from "../../../external/Maker/ERC20.sol";
 import { MatchingMarketInterface } from "../../../external/Maker/MatchingMarketInterface.sol";
 import { MathHelpers } from "../../../lib/MathHelpers.sol";
 import { TokenInteract } from "../../../lib/TokenInteract.sol";
@@ -35,10 +32,7 @@ import { ExchangeWrapper } from "../../interfaces/ExchangeWrapper.sol";
  *
  * dYdX ExchangeWrapper to interface with Maker's MatchingMarket contract (Oasis exchange)
  */
-contract MatchingMarketExchangeWrapper is
-    HasNoEther,
-    HasNoContracts,
-    ExchangeWrapper
+contract MatchingMarketExchangeWrapper is ExchangeWrapper
 {
     using SafeMath for uint256;
     using TokenInteract for address;
@@ -72,12 +66,12 @@ contract MatchingMarketExchangeWrapper is
     {
         assert(takerToken.balanceOf(address(this)) >= requestedFillAmount);
 
-        address market = MATCHING_MARKET;
-        takerToken.approve(market, requestedFillAmount);
-        uint256 receivedMakerAmount = MatchingMarketInterface(market).sellAllAmount(
-            ERC20(takerToken),
+        MatchingMarketInterface market = MatchingMarketInterface(MATCHING_MARKET);
+        takerToken.approve(address(market), requestedFillAmount);
+        uint256 receivedMakerAmount = market.sellAllAmount(
+            takerToken,
             requestedFillAmount,
-            ERC20(makerToken),
+            makerToken,
             0
         );
 
@@ -103,8 +97,8 @@ contract MatchingMarketExchangeWrapper is
         returns (uint256)
     {
         uint256 cost = MatchingMarketInterface(MATCHING_MARKET).getPayAmount(
-            ERC20(takerToken),
-            ERC20(makerToken),
+            takerToken,
+            makerToken,
             desiredMakerToken
         );
 

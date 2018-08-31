@@ -1,8 +1,6 @@
 pragma solidity 0.4.24;
 pragma experimental "v0.5.0";
 
-import { ERC20 } from "./ERC20.sol";
-
 
 contract SimpleMarketInterface {
 
@@ -10,9 +8,9 @@ contract SimpleMarketInterface {
 
     struct OfferInfo {
         uint     pay_amt;
-        ERC20    pay_gem;
+        address  pay_gem;
         uint     buy_amt;
-        ERC20    buy_gem;
+        address  buy_gem;
         address  owner;
         uint64   timestamp;
     }
@@ -44,7 +42,7 @@ contract SimpleMarketInterface {
     )
         public
         constant
-        returns (uint, ERC20, uint, ERC20);
+        returns (uint, address, uint, address);
 
     function bump(
         bytes32 id_
@@ -68,8 +66,8 @@ contract SimpleMarketInterface {
         bytes32 id) public;
 
     function make(
-        ERC20    pay_gem,
-        ERC20    buy_gem,
+        address  pay_gem,
+        address  buy_gem,
         uint128  pay_amt,
         uint128  buy_amt
     )
@@ -79,9 +77,9 @@ contract SimpleMarketInterface {
 
     function offer(
         uint pay_amt,
-        ERC20 pay_gem,
+        address pay_gem,
         uint buy_amt,
-        ERC20 buy_gem
+        address buy_gem
     )
         public
         returns (uint id);

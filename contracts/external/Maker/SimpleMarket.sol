@@ -1,7 +1,7 @@
 pragma solidity 0.4.24;
 
 import "./DSMath.sol";
-import "./ERC20.sol";
+import { ERC20 } from "openzeppelin-solidity/contracts/token/ERC20/ERC20.sol";
 
 
 contract EventfulMarket {

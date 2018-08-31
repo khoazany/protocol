@@ -1,7 +1,6 @@
 pragma solidity 0.4.24;
 pragma experimental "v0.5.0";
 
-import { ERC20 } from "./ERC20.sol";
 import { ExpiringMarketInterface } from "./ExpiringMarketInterface.sol";
 
 
@@ -36,8 +35,8 @@ contract MatchingMarketInterface is ExpiringMarketInterface {
     // ============ Functions ================
 
     function make(
-        ERC20    pay_gem,
-        ERC20    buy_gem,
+        address  pay_gem,
+        address  buy_gem,
         uint128  pay_amt,
         uint128  buy_amt
     )
@@ -57,18 +56,18 @@ contract MatchingMarketInterface is ExpiringMarketInterface {
 
     function offer(
         uint pay_amt,
-        ERC20 pay_gem,
+        address pay_gem,
         uint buy_amt,
-        ERC20 buy_gem
+        address buy_gem
     )
         public
         returns (uint);
 
     function offer(
         uint pay_amt,
-        ERC20 pay_gem,
+        address pay_gem,
         uint buy_amt,
-        ERC20 buy_gem,
+        address buy_gem,
         uint pos
     )
         public
@@ -76,9 +75,9 @@ contract MatchingMarketInterface is ExpiringMarketInterface {
 
     function offer(
         uint pay_amt,
-        ERC20 pay_gem,
+        address pay_gem,
         uint buy_amt,
-        ERC20 buy_gem,
+        address buy_gem,
         uint pos,
         bool rounding
     )
@@ -112,23 +111,23 @@ contract MatchingMarketInterface is ExpiringMarketInterface {
         returns (bool);
 
     function isTokenPairWhitelisted(
-        ERC20 baseToken,
-        ERC20 quoteToken
+        address baseToken,
+        address quoteToken
     )
         public
         constant
         returns (bool);
 
     function getMinSell(
-        ERC20 pay_gem
+        address pay_gem
     )
         public
         constant
         returns (uint);
 
     function getBestOffer(
-        ERC20 sell_gem,
-        ERC20 buy_gem
+        address sell_gem,
+        address buy_gem
     )
         public
         constant
@@ -149,8 +148,8 @@ contract MatchingMarketInterface is ExpiringMarketInterface {
         returns(uint);
 
     function getOfferCount(
-        ERC20 sell_gem,
-        ERC20 buy_gem
+        address sell_gem,
+        address buy_gem
     )
         public
         constant
@@ -172,26 +171,26 @@ contract MatchingMarketInterface is ExpiringMarketInterface {
         returns(bool);
 
     function sellAllAmount(
-        ERC20 pay_gem,
+        address pay_gem,
         uint pay_amt,
-        ERC20 buy_gem,
+        address buy_gem,
         uint min_fill_amount
     )
         public
         returns (uint fill_amt);
 
     function buyAllAmount(
-        ERC20 buy_gem,
+        address buy_gem,
         uint buy_amt,
-        ERC20 pay_gem,
+        address pay_gem,
         uint max_fill_amount
     )
         public
         returns (uint fill_amt);
 
     function getBuyAmount(
-        ERC20 buy_gem,
-        ERC20 pay_gem,
+        address buy_gem,
+        address pay_gem,
         uint pay_amt
     )
         public
@@ -199,8 +198,8 @@ contract MatchingMarketInterface is ExpiringMarketInterface {
         returns (uint fill_amt);
 
     function getPayAmount(
-        ERC20 pay_gem,
-        ERC20 buy_gem,
+        address pay_gem,
+        address buy_gem,
         uint buy_amt
     )
         public
