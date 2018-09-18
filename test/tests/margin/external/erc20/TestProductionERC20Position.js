@@ -4,8 +4,8 @@ chai.use(require('chai-bignumber')());
 const BigNumber = require('bignumber.js');
 
 const Margin = artifacts.require("Margin");
-const ERC20CappedShort = artifacts.require("ERC20CappedShort");
-const ERC20CappedLong = artifacts.require("ERC20CappedLong");
+const ProductionERC20Short = artifacts.require("ProductionERC20Short");
+const ProductionERC20Long = artifacts.require("ProductionERC20Long");
 const HeldToken = artifacts.require("TokenA");
 const OwedToken = artifacts.require("TokenB");
 
@@ -46,6 +46,7 @@ contract('ERC20Short', accounts => {
 
   let pepper = 0;
   const INITIAL_TOKEN_HOLDER = accounts[9];
+  const TRUSTED_LATE_CLOSER = accounts[8];
 
   before('Set up Proxy, Margin accounts', async () => {
     [
@@ -94,21 +95,23 @@ contract('ERC20Short', accounts => {
       POSITIONS.LONG.TOKEN_CONTRACT,
       POSITIONS.SHORT.TOKEN_CONTRACT
     ] = await Promise.all([
-      ERC20CappedLong.new(
+      ProductionERC20Long.new(
         POSITIONS.LONG.ID,
         dydxMargin.address,
         INITIAL_TOKEN_HOLDER,
         POSITIONS.LONG.TRUSTED_RECIPIENTS,
         POSITIONS.LONG.TRUSTED_WITHDRAWERS,
-        POSITIONS.LONG.NUM_TOKENS.times(multiplier)
+        POSITIONS.LONG.NUM_TOKENS.times(multiplier),
+        TRUSTED_LATE_CLOSER
       ),
-      ERC20CappedShort.new(
+      ProductionERC20Short.new(
         POSITIONS.SHORT.ID,
         dydxMargin.address,
         INITIAL_TOKEN_HOLDER,
         POSITIONS.SHORT.TRUSTED_RECIPIENTS,
         POSITIONS.LONG.TRUSTED_WITHDRAWERS,
-        POSITIONS.SHORT.NUM_TOKENS.times(multiplier)
+        POSITIONS.SHORT.NUM_TOKENS.times(multiplier),
+        TRUSTED_LATE_CLOSER
       )
     ]);
   }
@@ -136,19 +139,21 @@ contract('ERC20Short', accounts => {
     const untrustedAccount = accounts[7];
 
     it('sets constants correctly for short', async () => {
-      const tokenContract = await ERC20CappedShort.new(
+      const tokenContract = await ProductionERC20Short.new(
         positionId,
         dydxMargin.address,
         INITIAL_TOKEN_HOLDER,
         [trustedRecipient],
         [trustedWithdrawer],
-        tokenCap
+        tokenCap,
+        TRUSTED_LATE_CLOSER
       );
       const [
         supply,
         cap,
         pid,
         ith,
+        tlc,
         tr_is_tr,
         tw_is_tr,
         ua_is_tr,
@@ -160,6 +165,7 @@ contract('ERC20Short', accounts => {
         tokenContract.tokenCap.call(),
         tokenContract.POSITION_ID.call(),
         tokenContract.INITIAL_TOKEN_HOLDER.call(),
+        tokenContract.TRUSTED_LATE_CLOSER.call(),
         tokenContract.TRUSTED_RECIPIENTS.call(trustedRecipient),
         tokenContract.TRUSTED_RECIPIENTS.call(trustedWithdrawer),
         tokenContract.TRUSTED_RECIPIENTS.call(untrustedAccount),
@@ -171,6 +177,7 @@ contract('ERC20Short', accounts => {
       expect(cap).to.be.bignumber.eq(tokenCap);
       expect(pid).to.be.bignumber.eq(positionId);
       expect(ith).to.be.bignumber.eq(INITIAL_TOKEN_HOLDER);
+      expect(tlc).to.be.bignumber.eq(TRUSTED_LATE_CLOSER);
       expect(tr_is_tr).to.be.true;
       expect(tw_is_tr).to.be.false;
       expect(ua_is_tr).to.be.false;
@@ -180,19 +187,21 @@ contract('ERC20Short', accounts => {
     });
 
     it('sets constants correctly for long', async () => {
-      const tokenContract = await ERC20CappedShort.new(
+      const tokenContract = await ProductionERC20Short.new(
         positionId,
         dydxMargin.address,
         INITIAL_TOKEN_HOLDER,
         [trustedRecipient],
         [trustedWithdrawer],
-        tokenCap
+        tokenCap,
+        TRUSTED_LATE_CLOSER
       );
       const [
         supply,
         cap,
         pid,
         ith,
+        tlc,
         tr_is_tr,
         tw_is_tr,
         ua_is_tr,
@@ -204,6 +213,7 @@ contract('ERC20Short', accounts => {
         tokenContract.tokenCap.call(),
         tokenContract.POSITION_ID.call(),
         tokenContract.INITIAL_TOKEN_HOLDER.call(),
+        tokenContract.TRUSTED_LATE_CLOSER.call(),
         tokenContract.TRUSTED_RECIPIENTS.call(trustedRecipient),
         tokenContract.TRUSTED_RECIPIENTS.call(trustedWithdrawer),
         tokenContract.TRUSTED_RECIPIENTS.call(untrustedAccount),
@@ -215,6 +225,7 @@ contract('ERC20Short', accounts => {
       expect(cap).to.be.bignumber.eq(tokenCap);
       expect(pid).to.be.bignumber.eq(positionId);
       expect(ith).to.be.bignumber.eq(INITIAL_TOKEN_HOLDER);
+      expect(tlc).to.be.bignumber.eq(TRUSTED_LATE_CLOSER);
       expect(tr_is_tr).to.be.true;
       expect(tw_is_tr).to.be.false;
       expect(ua_is_tr).to.be.false;

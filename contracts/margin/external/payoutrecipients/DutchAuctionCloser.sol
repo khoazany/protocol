@@ -179,6 +179,15 @@ contract DutchAuctionCloser is
             uint256 auctionEndTimestamp
         ) = getAuctionTimeLimits(positionId);
 
+        require(
+            block.timestamp >= auctionStartTimestamp,
+            "DutchAuctionCloser#getAuctionTimeLimits: Auction has not started"
+        );
+        require(
+            block.timestamp <= auctionEndTimestamp,
+            "DutchAuctionCloser#getAuctionTimeLimits: Auction has ended"
+        );
+
         // linearly decreases from maximum amount to zero over the course of the auction
         return MathHelpers.getPartialAmount(
             auctionEndTimestamp.sub(block.timestamp),
@@ -187,12 +196,12 @@ contract DutchAuctionCloser is
         );
     }
 
-    // ============ Private Helper-Functions ============
+    // ============ Internal Helper-Functions ============
 
     function getAuctionTimeLimits(
         bytes32 positionId
     )
-        private
+        internal
         view
         returns (
             uint256 /* auctionStartTimestamp */,
@@ -226,15 +235,6 @@ contract DutchAuctionCloser is
             auctionStartTimestamp = callTimestamp.add(callTimeLimit).sub(auctionLength);
             auctionEndTimestamp = callTimestamp.add(callTimeLimit);
         }
-
-        require(
-            block.timestamp >= auctionStartTimestamp,
-            "DutchAuctionCloser#getAuctionTimeLimits: Auction has not started"
-        );
-        require(
-            block.timestamp <= auctionEndTimestamp,
-            "DutchAuctionCloser#getAuctionTimeLimits: Auction has ended"
-        );
 
         return (
             auctionStartTimestamp,
